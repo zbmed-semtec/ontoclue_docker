@@ -49,7 +49,7 @@ case $choice in
   5)
     echo ">> You selected: BERT"
     echo ">> Downloading repository for BERT."
-    approach="bert-embeddings-doc-relevance"
+    approach="bert-embeddings-doc-relevance-training"
     ;;
   6|7|8|9|10|11|12|13|14|15)
     echo ">> You selected: Hybrid approach"
