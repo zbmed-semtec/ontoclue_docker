@@ -52,9 +52,74 @@ case $choice in
     approach="bert-embeddings-doc-relevance-training"
     ;;
   6|7|8|9|10|11|12|13|14|15)
-    echo ">> You selected: Hybrid approach"
-    echo ">> Downloading repository for Hybrid approach."
     approach="hybrid-doc-relevance-training"
+
+    case $choice in
+      6|7|8|9)
+      category="pre"
+        case $choice in
+          6)
+          algorithm="word2doc2vec"
+          echo ">> You selected: Hybrid-pre-word2doc2vec approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+          7)
+          algorithm="doc2vec"
+          echo ">> You selected: Hybrid-pre-doc2vec approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+          8)
+          algorithm="fasttext"
+          echo ">> You selected: Hybrid-pre-fasttext approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+          9)
+          algorithm="wmd-word2vec"
+          echo ">> You selected: Hybrid-pre-wmd-word2vec approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+        esac
+      ;;
+      10|11|12)
+      category="post"
+        case $choice in
+          10)
+          algorithm="word2doc2vec"
+          echo ">> You selected: Hybrid-post-word2doc2vec approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+          11)
+          algorithm="fasttext"
+          echo ">> You selected: Hybrid-post-fasttext approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+          12)
+          algorithm="wmd-word2vec"
+          echo ">> You selected: Hybrid-post-wmd-word2vec approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+        esac
+      ;;
+      13|14|15)
+      category="postreduction"
+        case $choice in
+          13)
+          algorithm="word2doc2vec"
+          echo ">> You selected: Hybrid-postreduction-word2doc2vec approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+          14)
+          algorithm="fasttext"
+          echo ">> You selected: Hybrid-postreduction-fasttext approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+          15)
+          algorithm="wmd-word2vec"
+          echo ">> You selected: Hybrid-postreduction-wmd-word2vec approach"
+          echo ">> Downloading repository for Hybrid approach."
+          ;;
+        esac
+    esac
     ;;
   *)
     echo "Invalid choice. Exiting."
@@ -62,10 +127,11 @@ case $choice in
     ;;
 esac
 
+echo ""
 git clone https://github.com/zbmed-semtec/${approach}.git
 echo "Repository cloned successfully."
  
-annotated_data_list=("7" "8" "9")
+annotated_data_list=("6" "7" "8" "9")
 
 annotated_data=false
 for num in "${annotated_data_list[@]}"; do
@@ -106,8 +172,8 @@ esac
 
 echo ""
 echo "Do you want to use the validation dataset for $approach approach: "
-echo "y.Uses validation dataset to optimize hyperparameters for the model."
-echo "n.Uses test dataset to optimize the hyperparameters and evaluate the model."
+echo "y. Uses validation dataset to optimize hyperparameters for the model."
+echo "n. Uses test dataset to optimize the hyperparameters and evaluate the model."
 echo ""
 
 read -p "Select yes or no (y/n): " validation
@@ -117,9 +183,17 @@ echo ""
 case $validation in
   y)
     echo "Using validation datasets."
+    validation_dataset="data/Split_Dataset/Data/valid.npy"
+    valid_ground_truth="data/Split_Dataset/Ground_truth/valid.tsv"
+    test_dataset="data/Split_Data/Dataset/test.npy"
+    test_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
     ;;
   n)
     echo "Using test datasets."
+    validation_dataset="data/Split_Dataset/Data/test.npy"
+    valid_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
+    test_dataset="data/Split_Data/Dataset/test.npy"
+    test_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
     ;;
   *)
     echo "Invalid choice. Exiting."
@@ -127,5 +201,18 @@ case $validation in
     ;;
 esac
 
-echo "Initiating pipeline."
+train_dataset="data/Split_Dataset/Data/train.npy"
+
+echo $(pwd)
+ 
+if [[ -n "$category" ]]; then
+  python_script="code/${category}/${algorithm}/main.py"
+else
+  python_script="code/main.py"
+fi
+
+echo ">> Initiating pipeline."
+
+python3 $python_script -i $train_dataset -v $validation_dataset -t $test_dataset -gv $valid_ground_truth -gt $test_ground_truth -c $n_class -win 0
+
 tail -f /dev/null
