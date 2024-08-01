@@ -9,7 +9,7 @@ class TestDataset:
 
     @pytest.fixture(autouse=True)
     def setup(self):
-        self.base_path = "./data/Split_Dataset"
+        self.base_path = "../data/Split_Dataset"
         self.data_path = os.path.join(self.base_path, "Data")
         self.annotated_data_path = os.path.join(self.base_path, "Annotated_Data")
         self.ground_truth_path = os.path.join(self.base_path, "Ground_truth")

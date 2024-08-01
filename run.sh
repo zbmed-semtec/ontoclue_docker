@@ -130,7 +130,8 @@ esac
 echo ""
 git clone https://github.com/zbmed-semtec/${approach}.git
 echo "Repository cloned successfully."
- 
+
+
 annotated_data_list=("6" "7" "8" "9")
 
 annotated_data=false
@@ -141,9 +142,38 @@ for num in "${annotated_data_list[@]}"; do
     fi
 done
 
-sh data.sh "$approach" "$annotated_data" 
+# sh data.sh "$approach" "$annotated_data" 
 
 cd ${approach}
+git checkout dev
+echo "Changed branch"
+
+echo ""
+echo "Do you want to run tests for the ${approach} approach?"
+echo "y. Run test for checking the datasets and reproducibility of the runs."
+echo "n. Skip running test and execute the ${approach} pipeline."
+echo ""
+
+read -p "Select yes or no (y/n): " test
+echo ">> You selected: $test"
+echo ""
+
+case $test in
+  y)
+    echo "Running tests for dataset"
+    pytest ../tests/test_dataset.py
+    echo $(pwd)
+    echo "Running tests for reproducible runs"
+    pytest ../tests/test_reproducibility.py
+    ;;
+  n)
+    echo "Skipping tests"
+    ;;
+  *)
+    echo "Invalid choice. Exiting."
+    exit 1
+    ;;
+esac
 
 echo ""
 echo "Select a class distribution for $approach approach: "
