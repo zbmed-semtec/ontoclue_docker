@@ -86,12 +86,12 @@ class TestRun:
 
     
         precision_df_one = pd.read_csv('output_3/evaluation/precision_3.tsv', sep='\t')
-        precision_values_one = precision_df_one[-1].tolist()
+        precision_values_one = precision_df_one.iloc[-1].tolist()
 
         if os.path.exists('output_3'):
             shutil.rmtree('output_3')
         
-        subprocess.run(['python3', 'code/main.py', '-i', '../data/Split_Dataset/Data/train.npy', '-v', '../data/Split_Dataset/Data/test.npy', '-t', '../data/Split_Dataset/Data/test.npy', '-gv', '../data/Split_Dataset/Ground_truth/test.tsv', '-gt', '../data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+        subprocess.run(['python3', 'code/main.py', '-i', '../data/Split_Dataset/Data/train.npy', '-t', '../data/Split_Dataset/Data/test.npy', '-g', '../data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
 
         with open(self.log_file, 'r') as file:
             lines = file.readlines()
@@ -105,7 +105,37 @@ class TestRun:
                 params_dict_two = eval(params_str)
         
         precision_df_two = pd.read_csv('output_3/evaluation/precision_3.tsv', sep='\t')
-        precision_values_two = precision_df_two[-1].tolist()
+        precision_values_two = precision_df_two.iloc[-1].tolist()
 
         assert params_dict_one == params_dict_two, "Hyperparameter configurations differ between runs!"
         assert precision_values_one == precision_values_two, "Precision values differ between runs!"
+
+        if os.path.exists('output_3'):
+            shutil.rmtree('output_3')
+
+    def test_remodify_yaml(self):
+
+        original_data = self.content.copy()
+
+        if 'params' in original_data:
+            if 'epochs' in original_data['params']:
+                original_data['params']['epochs']['values'] = [5, 15]  # Change epochs for testing
+        if 'iterations' in original_data:
+            if 'n_trials' in original_data['iterations']:
+                original_data['iterations']['n_trials']['value'] = 100
+
+        with open(self.parameter_file_path, 'w') as file:
+            yaml.dump(original_data, file, default_flow_style=None)
+
+        with open(self.parameter_file_path, 'r') as file:
+            updated_original_content = yaml.safe_load(file)
+
+
+        # Assertions to verify the modifications
+        assert 'params' in updated_original_content
+        assert 'epochs' in updated_original_content['params']
+        assert updated_original_content['params']['epochs']['values'] == [5, 15]
+
+        assert 'iterations' in updated_original_content
+        assert 'n_trials' in updated_original_content['iterations']
+        assert updated_original_content['iterations']['n_trials']['value'] == 100

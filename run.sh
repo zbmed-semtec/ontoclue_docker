@@ -142,7 +142,7 @@ for num in "${annotated_data_list[@]}"; do
     fi
 done
 
-# sh data.sh "$approach" "$annotated_data" 
+sh data.sh "$approach" "$annotated_data" 
 
 cd ${approach}
 git checkout dev
@@ -200,38 +200,9 @@ case $class in
     ;;
 esac
 
-echo ""
-echo "Do you want to use the validation dataset for $approach approach: "
-echo "y. Uses validation dataset to optimize hyperparameters for the model."
-echo "n. Uses test dataset to optimize the hyperparameters and evaluate the model."
-echo ""
-
-read -p "Select yes or no (y/n): " validation
-echo ">> You selected: $validation"
-echo ""
-
-case $validation in
-  y)
-    echo "Using validation datasets."
-    validation_dataset="data/Split_Dataset/Data/valid.npy"
-    valid_ground_truth="data/Split_Dataset/Ground_truth/valid.tsv"
-    test_dataset="data/Split_Data/Dataset/test.npy"
-    test_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
-    ;;
-  n)
-    echo "Using test datasets."
-    validation_dataset="data/Split_Dataset/Data/test.npy"
-    valid_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
-    test_dataset="data/Split_Data/Dataset/test.npy"
-    test_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
-    ;;
-  *)
-    echo "Invalid choice. Exiting."
-    exit 1
-    ;;
-esac
-
 train_dataset="data/Split_Dataset/Data/train.npy"
+test_dataset="data/Split_Dataset/Data/test.npy"
+test_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
 
 echo $(pwd)
  
@@ -243,6 +214,6 @@ fi
 
 echo ">> Initiating pipeline."
 
-python3 $python_script -i $train_dataset -v $validation_dataset -t $test_dataset -gv $valid_ground_truth -gt $test_ground_truth -c $n_class -win 0
+python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -c $n_class -win 0
 
 tail -f /dev/null
