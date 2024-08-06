@@ -9,7 +9,7 @@ In order to get started with the pipeline it is essential that you have Docker i
 
 ### Setting up Docker on Linux
 
-For Linux distribution like Ubuntu, Debian, CentOS, etc, we do the following:
+For Linux distribution like Ubuntu, Debian, CentOS, execute the following:
 
 1. Update your existing list of packages:
 ```
