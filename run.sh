@@ -21,7 +21,7 @@ echo "14. Hybrid-postreduction-fasttext"
 echo "15. Hybrid-postreduction-wmd-word2vec"
 echo ""
 
-read -p "Enter the number corresponding to your choice: " choice
+read -p "Enter the number corresponding to the approach: " choice
 echo "-------------------------------------------------"
 echo ""
 
