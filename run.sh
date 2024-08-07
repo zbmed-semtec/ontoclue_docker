@@ -203,7 +203,7 @@ esac
 train_dataset="data/Split_Dataset/Data/train.npy"
 test_dataset="data/Split_Dataset/Data/test.npy"
 test_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
-
+mesh_pmid_dict="data/mesh_to_pmid_dict.tsv"
 echo $(pwd)
  
 if [[ -n "$category" ]]; then
@@ -214,6 +214,17 @@ fi
 
 echo ">> Initiating pipeline."
 
-python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -c $n_class -win 0
+
+if [ -z "${category}" ]; then
+    python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -c $n_class -win 0
+elif [ "$category" = "pre" ]; then
+    python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -c $n_class -win 0
+elif [ "$category" = "post" ] || [ "$category" = "postreduction" ]; then
+    python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -dict $mesh_pmid_dict -c $n_class -win 0
+else
+    echo "Invalid category value: $category"
+    exit 1
+fi
+
 
 tail -f /dev/null
