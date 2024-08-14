@@ -1,0 +1,14 @@
+gdown
+pandas==2.1.1
+numpy==1.26.1
+gensim==4.3.1
+numba==0.58.1
+tqdm==4.66.1
+scipy==1.11.3
+matplotlib==3.8.0
+matplotlib-inline==0.1.6
+optuna==3.5.0
+scikit-learn==1.4.0
+PyYAML==6.0.1
+pytest
+regex
