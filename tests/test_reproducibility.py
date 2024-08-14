@@ -12,15 +12,21 @@ class TestRun:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.base_path = "code"
+        self.test_dir_one = "../tests/run_one"
+        self.test_dir_two = "../tests/run_two"
         self.log_file = "output_3/Optuna_trials_3.log"
         self.evaluation_path = "output_3/evaluation"
-        self.precision_file = "precision_3.tsv"
         self.parameter_file = "hyperparameters.yaml"
+        self.precision_file = os.path.join(self.evaluation_path, "precision_3.tsv")
         self.parameter_file_path = os.path.join(self.base_path, self.parameter_file)
         with open(self.parameter_file_path, 'r') as file:
             self.content = yaml.safe_load(file)
             self.params = self.content.get('params', {})
             self.iterations = self.content.get('iterations', {})
+        
+        os.makedirs(self.test_dir_one, exist_ok=True)
+        os.makedirs(self.test_dir_two, exist_ok=True)
+
 
     def test_parameters(self):
         for key, param in self.params.items():
@@ -52,7 +58,7 @@ class TestRun:
                 modified_data['params']['epochs']['values'] = [1, 2]  # Change epochs for testing
         if 'iterations' in modified_data:
             if 'n_trials' in modified_data['iterations']:
-                modified_data['iterations']['n_trials']['value'] = 1  # Change iterations for testing
+                modified_data['iterations']['n_trials']['value'] = 3  # Change iterations for testing
 
         with open(self.parameter_file_path, 'w') as file:
             yaml.dump(modified_data, file, default_flow_style=None)
@@ -67,11 +73,11 @@ class TestRun:
 
         assert 'iterations' in updated_content
         assert 'n_trials' in updated_content['iterations']
-        assert updated_content['iterations']['n_trials']['value'] == 1
+        assert updated_content['iterations']['n_trials']['value'] == 3
 
     def test_runs(self):
 
-        subprocess.run(['python3', 'code/main.py', '-i', '../data/Split_Dataset/Data/train.npy', '-t', '../data/Split_Dataset/Data/test.npy', '-g', '../data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+        subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
 
         with open(self.log_file, 'r') as file:
             lines = file.readlines()
@@ -82,16 +88,28 @@ class TestRun:
                 params_line = lines[line_no+1]
                 match = re.search(r"Params: ({.*})", params_line)
                 params_str = match.group(1)
-                params_dict_one = eval(params_str)
-
+                run_one_trial_one = eval(params_str)
+            if "Trial number: 1" in line:
+                params_line = lines[line_no+1]
+                match = re.search(r"Params: ({.*})", params_line)
+                params_str = match.group(1)
+                run_one_trial_two = eval(params_str)
+            if "Trial number: 2" in line:
+                params_line = lines[line_no+1]
+                match = re.search(r"Params: ({.*})", params_line)
+                params_str = match.group(1)
+                run_one_trial_three = eval(params_str)
     
-        precision_df_one = pd.read_csv('output_3/evaluation/precision_3.tsv', sep='\t')
+        precision_df_one = pd.read_csv(self.precision_file, sep='\t')
         precision_values_one = precision_df_one.iloc[-1].tolist()
+
+        shutil.copy(self.log_file, self.test_dir_one)
+        shutil.copy(self.precision_file, self.test_dir_one)
 
         if os.path.exists('output_3'):
             shutil.rmtree('output_3')
         
-        subprocess.run(['python3', 'code/main.py', '-i', '../data/Split_Dataset/Data/train.npy', '-t', '../data/Split_Dataset/Data/test.npy', '-g', '../data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+        subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
 
         with open(self.log_file, 'r') as file:
             lines = file.readlines()
@@ -102,14 +120,29 @@ class TestRun:
                 params_line = lines[line_no+1]
                 match = re.search(r"Params: ({.*})", params_line)
                 params_str = match.group(1)
-                params_dict_two = eval(params_str)
-        
-        precision_df_two = pd.read_csv('output_3/evaluation/precision_3.tsv', sep='\t')
+                run_two_trial_one = eval(params_str)
+            if "Trial number: 1" in line:
+                params_line = lines[line_no+1]
+                match = re.search(r"Params: ({.*})", params_line)
+                params_str = match.group(1)
+                run_two_trial_two = eval(params_str)
+            if "Trial number: 2" in line:
+                params_line = lines[line_no+1]
+                match = re.search(r"Params: ({.*})", params_line)
+                params_str = match.group(1)
+                run_two_trial_three = eval(params_str)
+
+        precision_df_two = pd.read_csv(self.precision_file, sep='\t')
         precision_values_two = precision_df_two.iloc[-1].tolist()
 
-        assert params_dict_one == params_dict_two, "Hyperparameter configurations differ between runs!"
-        assert precision_values_one == precision_values_two, "Precision values differ between runs!"
+        shutil.copy(self.log_file, self.test_dir_two)
+        shutil.copy(self.precision_file, self.test_dir_two)
 
+        assert run_one_trial_one == run_two_trial_one, "Hyperparameter configurations differ between runs: trial one!"
+        assert run_one_trial_two == run_two_trial_two, "Hyperparameter configurations differ between runs: trial two!"
+        assert run_one_trial_three == run_two_trial_three, "Hyperparameter configurations differ between runs: trial three!"
+        assert precision_values_one == precision_values_two, "Precision values differ between runs!"
+        
         if os.path.exists('output_3'):
             shutil.rmtree('output_3')
 
@@ -122,7 +155,7 @@ class TestRun:
                 original_data['params']['epochs']['values'] = [5, 15]  # Change epochs for testing
         if 'iterations' in original_data:
             if 'n_trials' in original_data['iterations']:
-                original_data['iterations']['n_trials']['value'] = 100
+                original_data['iterations']['n_trials']['value'] = 100 # Change iterations for testing
 
         with open(self.parameter_file_path, 'w') as file:
             yaml.dump(original_data, file, default_flow_style=None)
