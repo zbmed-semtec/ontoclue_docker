@@ -162,10 +162,10 @@ while true; do
   case $test in
     y)
       echo "Running tests for dataset"
-      echo "This could take a minute or two."
+      echo "WARNING! This could take a minute or two."
       pytest ../tests/test_dataset.py
-      echo "Running tests for reproducible runs"
-      echo "This could take up to five minutes."
+      echo "Running tests for run reproducibility"
+      echo "WARNING! This could take up to 2 hours."
       pytest ../tests/test_reproducibility.py
       break
       ;;
