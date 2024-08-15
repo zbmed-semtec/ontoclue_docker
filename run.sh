@@ -165,7 +165,7 @@ while true; do
       echo "WARNING! This could take a minute or two."
       pytest ../tests/test_dataset.py
       echo "Running tests for run reproducibility"
-      echo "WARNING! This could take up to 2 hours."
+      echo "WARNING! This could take up to 2 to 3 hours."
       pytest ../tests/test_reproducibility.py
       break
       ;;

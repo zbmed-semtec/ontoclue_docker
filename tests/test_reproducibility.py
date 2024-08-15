@@ -12,8 +12,8 @@ class TestRun:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.base_path = "code"
-        self.test_dir_one = "../tests/run_one"
-        self.test_dir_two = "../tests/run_two"
+        self.test_dir_1 = "../tests/run_one"
+        self.test_dir_2 = "../tests/run_two"
         self.log_file = "output_3/Optuna_trials_3.log"
         self.evaluation_path = "output_3/evaluation"
         self.parameter_file = "hyperparameters.yaml"
@@ -24,8 +24,8 @@ class TestRun:
             self.params = self.content.get('params', {})
             self.iterations = self.content.get('iterations', {})
         
-        os.makedirs(self.test_dir_one, exist_ok=True)
-        os.makedirs(self.test_dir_two, exist_ok=True)
+        os.makedirs(self.test_dir_1, exist_ok=True)
+        os.makedirs(self.test_dir_2, exist_ok=True)
 
 
     def test_parameters(self):
@@ -77,71 +77,32 @@ class TestRun:
 
     def test_runs(self):
 
-        subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+        run_trials = {}
+        for run in range(1, 3):
+            subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
 
-        with open(self.log_file, 'r') as file:
-            lines = file.readlines()
-                
-        params_line = None
-        for line_no, line in enumerate(lines):
-            if "Trial number: 0" in line:
-                params_line = lines[line_no+1]
-                match = re.search(r"Params: ({.*})", params_line)
-                params_str = match.group(1)
-                run_one_trial_one = eval(params_str)
-            if "Trial number: 1" in line:
-                params_line = lines[line_no+1]
-                match = re.search(r"Params: ({.*})", params_line)
-                params_str = match.group(1)
-                run_one_trial_two = eval(params_str)
-            if "Trial number: 2" in line:
-                params_line = lines[line_no+1]
-                match = re.search(r"Params: ({.*})", params_line)
-                params_str = match.group(1)
-                run_one_trial_three = eval(params_str)
-    
-        precision_df_one = pd.read_csv(self.precision_file, sep='\t')
-        precision_values_one = precision_df_one.iloc[-1].tolist()
-
-        shutil.copy(self.log_file, self.test_dir_one)
-        shutil.copy(self.precision_file, self.test_dir_one)
-
-        if os.path.exists('output_3'):
-            shutil.rmtree('output_3')
+            with open(self.log_file, 'r') as file:
+                lines = file.readlines()
+            run_trials[run] = {}
+            params_line = None
+            for trial_no in range(3):
+                for line_no, line in enumerate(lines):
+                    if f"Trial number: {trial_no}" in line:
+                        params_line = lines[line_no+1]
+                        match = re.search(r"Params: ({.*})", params_line)
+                        params_str = match.group(1)
+                        run_trials[run][trial_no] = eval(params_str)
         
-        subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+            precision_df_one = pd.read_csv(self.precision_file, sep='\t')
+            run_trials[run]['precision'] = precision_df_one.iloc[-1].tolist()
 
-        with open(self.log_file, 'r') as file:
-            lines = file.readlines()
-
-        params_line = None
-        for line_no, line in enumerate(lines):
-            if "Trial number: 0" in line:
-                params_line = lines[line_no+1]
-                match = re.search(r"Params: ({.*})", params_line)
-                params_str = match.group(1)
-                run_two_trial_one = eval(params_str)
-            if "Trial number: 1" in line:
-                params_line = lines[line_no+1]
-                match = re.search(r"Params: ({.*})", params_line)
-                params_str = match.group(1)
-                run_two_trial_two = eval(params_str)
-            if "Trial number: 2" in line:
-                params_line = lines[line_no+1]
-                match = re.search(r"Params: ({.*})", params_line)
-                params_str = match.group(1)
-                run_two_trial_three = eval(params_str)
-
-        precision_df_two = pd.read_csv(self.precision_file, sep='\t')
-        precision_values_two = precision_df_two.iloc[-1].tolist()
-
-        shutil.copy(self.log_file, self.test_dir_two)
-        shutil.copy(self.precision_file, self.test_dir_two)
-
-        assert run_one_trial_one == run_two_trial_one, "Hyperparameter configurations differ between runs: trial one!"
-        assert run_one_trial_two == run_two_trial_two, "Hyperparameter configurations differ between runs: trial two!"
-        assert run_one_trial_three == run_two_trial_three, "Hyperparameter configurations differ between runs: trial three!"
-        assert precision_values_one == precision_values_two, "Precision values differ between runs!"
+            shutil.copy(self.log_file, f'self.test_dir_{run}')
+            shutil.copy(self.precision_file, f'self.test_dir_{run}')
+        
+        assert run_trials[1][0] == run_trials[2][0], "Hyperparameter configurations differ between runs: trial one!"
+        assert run_trials[1][1] == run_trials[2][1], "Hyperparameter configurations differ between runs: trial two!"
+        assert run_trials[1][2] == run_trials[2][2], "Hyperparameter configurations differ between runs: trial three!"
+        assert run_trials[1]['precision'] == run_trials[2]['precision'], "Precision values differ between runs!"
         
         if os.path.exists('output_3'):
             shutil.rmtree('output_3')
