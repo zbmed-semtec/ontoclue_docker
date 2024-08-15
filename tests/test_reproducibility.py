@@ -79,7 +79,7 @@ class TestRun:
 
         run_trials = {}
         for run in range(1, 3):
-            subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+            subprocess.run(['python3', 'code/main.py', '-i', '../data/Split_Dataset/Data/train.npy', '-t', '../data/Split_Dataset/Data/test.npy', '-g', '../data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
 
             with open(self.log_file, 'r') as file:
                 lines = file.readlines()
@@ -95,9 +95,12 @@ class TestRun:
         
             precision_df_one = pd.read_csv(self.precision_file, sep='\t')
             run_trials[run]['precision'] = precision_df_one.iloc[-1].tolist()
+            
+            test_dir_log_filename = f'test_dir_{run}'
+            test_dir = getattr(self, test_dir_log_filename)
 
-            shutil.copy(self.log_file, f'self.test_dir_{run}')
-            shutil.copy(self.precision_file, f'self.test_dir_{run}')
+            shutil.copy(self.log_file, os.path.join(test_dir, 'Optuna_trials_3.log'))
+            shutil.copy(self.precision_file, os.path.join(test_dir, 'precision_3.tsv'))
         
         assert run_trials[1][0] == run_trials[2][0], "Hyperparameter configurations differ between runs: trial one!"
         assert run_trials[1][1] == run_trials[2][1], "Hyperparameter configurations differ between runs: trial two!"
