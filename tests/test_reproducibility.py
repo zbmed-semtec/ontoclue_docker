@@ -79,7 +79,7 @@ class TestRun:
 
         run_trials = {}
         for run in range(1, 3):
-            subprocess.run(['python3', 'code/main.py', '-i', '../data/Split_Dataset/Data/train.npy', '-t', '../data/Split_Dataset/Data/test.npy', '-g', '../data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+            subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
 
             with open(self.log_file, 'r') as file:
                 lines = file.readlines()

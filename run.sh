@@ -48,7 +48,7 @@ case $choice in
     4)
       echo ">> You selected: WMD-Word2vec"
       echo ">> Downloading repository for WMD-Word2vec."
-      approach="WMD-word2vec-doc-relevance-training"
+      approach="wmd-word2vec-training"
       break
       ;;
     5)
