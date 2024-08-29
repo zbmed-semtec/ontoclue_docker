@@ -215,7 +215,7 @@ test_ground_truth="data/Split_Dataset/Ground_truth/test.tsv"
 mesh_pmid_dict="data/mesh_to_pmid_dict.tsv"
  
 if [[ -n "$category" ]]; then
-  python_script="code/${category}/${algorithm}/main.py"
+  python_script="code/${algorithm}/${category}/main.py"
 else
   python_script="code/main.py"
 fi
