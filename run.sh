@@ -20,17 +20,28 @@ while true; do
   echo "13. Hybrid-postreduction-word2doc2vec"
   echo "14. Hybrid-postreduction-fasttext"
   echo "15. Hybrid-postreduction-wmd-word2vec"
-  echo ""
+  echo "16. Word2doc2vec using pre-trained model"
+  echo "17. fastText using pre-trained model"
+  echo "18. WMD-Word2vec using pre-trained model"
 
   read -p "Enter the number corresponding to the approach: " choice
   echo "-------------------------------------------------"
   echo ""
 
 case $choice in
-    1)
-      echo ">> You selected: Word2doc2vec"
-      echo ">> Downloading repository for Word2doc2vec."
+    1|16)
       approach="word2doc2vec-doc-relevance-training"
+      case $choice in
+        1)
+          echo ">> You selected: Word2doc2vec"
+          echo ">> Downloading repository for Word2doc2vec."
+        ;;
+        16)
+          pretrained="true"
+          echo ">> You selected: Word2doc2vec using a pre-traine model"
+          echo ">> Downloading repository for Word2doc2vec."
+        ;;
+      esac
       break
       ;;
     2)
@@ -39,16 +50,34 @@ case $choice in
       approach="doc2vec-doc-relevance-training"
       break
       ;;
-    3)
-      echo ">> You selected: fastText"
-      echo ">> Downloading repository for fastText."
+    3|17)
       approach="fasttext2doc2vec-doc-relevance-training"
+      case $choice in
+        3)
+          echo ">> You selected: fastText"
+          echo ">> Downloading repository for fastText."
+        ;;
+        17)
+          pretrained="true"
+          echo ">> You selected: fastText using a pre-trained model"
+          echo ">> Downloading repository for fastText."
+        ;;
+      esac
       break
       ;;
-    4)
-      echo ">> You selected: WMD-Word2vec"
-      echo ">> Downloading repository for WMD-Word2vec."
+    4|18)
       approach="wmd-word2vec-training"
+      case $choice in
+        4)
+          echo ">> You selected: WMD-Word2vec"
+          echo ">> Downloading repository for WMD-Word2vec."
+        ;;
+        18)
+          pretrained="true"
+          echo ">> You selected: WMD-Word2vec using a pre-trained model"
+          echo ">> Downloading repository for WMD-Word2vec."
+        ;;
+      esac
       break
       ;;
     5)
@@ -59,7 +88,6 @@ case $choice in
       ;;
     6|7|8|9|10|11|12|13|14|15)
       approach="hybrid-doc-relevance-training"
-
       case $choice in
         6|7|8|9)
         category="pre"
@@ -222,8 +250,10 @@ fi
 
 echo ">> Initiating pipeline."
 
-
-if [ -z "${category}" ]; then
+if [ "$pretrained" = "true" ]; then
+  echo ">> Downloading Pre-trained model."
+  python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -c $n_class -u 1 -win 0
+elif [ -z "${category}" ]; then
     python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -c $n_class -win 0
 elif [ "$category" = "pre" ]; then
     python3 $python_script -i $train_dataset -t $test_dataset -g $test_ground_truth -c $n_class -win 0
@@ -233,6 +263,5 @@ else
     echo "Invalid category value: $category"
     exit 1
 fi
-
 
 tail -f /dev/null

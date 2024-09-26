@@ -181,6 +181,7 @@ The output files will be stored in the directory ```<name_of_the_approach/output
 #### 4. Copying files to your local system
 To copy files in your local system, find out the container ID and execute
 
+```
 sudo docker cp <container_ID>:/<name_of_the_approach>/output_[3/2] <path_to_local_dir>
-
+```
 The first path is the path in the Docker container and the second path is the path on your local system 
