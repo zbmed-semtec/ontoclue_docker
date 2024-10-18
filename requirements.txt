@@ -1,7 +1,6 @@
-gdown
 pandas==2.1.1
 numpy==1.26.1
-gensim==4.3.1
+gensim==4.3.2
 numba==0.58.1
 tqdm==4.66.1
 scipy==1.11.3
@@ -11,5 +10,7 @@ optuna==3.5.0
 scikit-learn==1.4.0
 POT==0.9.3
 PyYAML==6.0.1
+nltk==3.8.1
 pytest
+pytest-xdist
 regex
