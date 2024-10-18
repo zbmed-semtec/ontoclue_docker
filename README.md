@@ -80,20 +80,33 @@ sudo apt install docker-ce
 
 ## Getting Started
 
+### 1. Clone the Repository
+First, clone the repository to your local machine using the following command:
 
-### 1. Building the Docker Image:
+##### Using HTTP:
+```
+git clone https://github.com/zbmed-semtec/private-ontoclue-project.git
+```
+
+##### Using SSH:
+Ensure you have set up SSH keys in your GitHub account.
+```
+git clone git@github.com:zbmed-semtec/private-ontoclue-project.git
+```
+
+### 2. Building the Docker Image:
 
 ```
 sudo docker build -t ontoclue .
 ```
 
-### 2. Running the Docker Container:
+### 3. Running the Docker Container:
 
 ```
 sudo docker run -it ontoclue
 ```
 
-### 3. Selecting Embedding Approach:
+### 4. Selecting Embedding Approach:
 
 After running the container, you will be prompted to select an embedding approach:
 
@@ -101,7 +114,7 @@ After running the container, you will be prompted to select an embedding approac
 
 Upon selecting an approach, the corresponding repository will be cloned from GitHub, and the appropriate datasets will be downloaded based on the chosen approach.
 
-### 4. Running Tests:
+### 5. Running Tests [Optional]:
 
 Once the datasets are downloaded, you will have the option to run tests. This is an optional step. These tests verify:
 
@@ -113,7 +126,7 @@ Depending on your preference, you can select **y** (yes) or **n** (no). You will
 
 ![](./docs/select_test.png)
 
-### 5. Selecting Class Distribution:
+### 6. Selecting Class Distribution:
 
 After the tests are completed, you will be prompted to select the class distribution. Depending on your preference, you can select **3** (three class distribution) or **2** (two class distribution).
 
@@ -121,7 +134,7 @@ After the tests are completed, you will be prompted to select the class distribu
 
 Following this, you will see a message indicating that the pipeline is being initiated. This process will take a while to complete 100 iterations.
 
-### 6. Acessing and Viewing Log Files:
+### 7. Acessing and Viewing Log Files:
 
 The progress of the run is logged into files named Optuna_trials_{class_distribution}.log. Follow the steps below to view these log files and copy output files from the Docker container to your local system.
 
