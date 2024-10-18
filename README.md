@@ -96,6 +96,7 @@ git clone git@github.com:zbmed-semtec/private-ontoclue-project.git
 
 ### 2. Building the Docker Image:
 
+Change the directory to `private-ontoclue-project` and execute the following command:
 ```
 sudo docker build -t ontoclue .
 ```
