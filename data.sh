@@ -12,7 +12,7 @@ mkdir -p Split_Dataset/Ground_truth
 
 
 
-if [ "$annotated_data" = true ]; then
+if [ "$annotated_data" = True ]; then
     cd Split_Dataset/Annotated_Data/
     echo "Downloading annotated datasets"
     gdown https://drive.google.com/uc?id=1p7noO4lOgf942FXBVwd40OrmFO5Go0Hn -O test_annotated.npy
