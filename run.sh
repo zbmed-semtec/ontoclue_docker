@@ -36,6 +36,8 @@ case $choice in
       approach="word2doc2vec-doc-relevance-training"
       if [ "$choice" -eq 16 ]; then
         pre_trained=true
+      else
+        pre_trained=false
       fi
       break
       ;;
@@ -51,6 +53,8 @@ case $choice in
       approach="fasttext2doc2vec-doc-relevance-training"
       if [ "$choice" -eq 17 ]; then
         pre_trained=true
+      else
+        pre_trained=false
       fi
       break
       ;;
@@ -60,6 +64,8 @@ case $choice in
       approach="wmd-word2vec-training"
       if [ "$choice" -eq 18 ]; then
         pre_trained=true
+      else
+        pre_trained=false
       fi
       break
       ;;
@@ -140,8 +146,26 @@ case $choice in
 done
 
 echo ""
-git clone https://github.com/zbmed-semtec/${approach}.git
-echo "Repository cloned successfully."
+attempt=1
+max_attempts=3
+
+while [ $attempt -le $max_attempts ]; do
+  git clone https://github.com/zbmed-semtec/${approach}.git
+
+  if [ $? -eq 0 ]; then
+    echo "Repository cloned successfully."
+    break
+  else
+    echo "Attempt $attempt of $max_attempts failed. Retrying..."
+    attempt=$((attempt+1))
+    sleep 2 
+  fi
+
+  if [ $attempt -gt $max_attempts ]; then
+    echo "Error: Git clone failed after $max_attempts attempts. Please check your authentication or repository URL."
+    exit 1
+  fi
+done
 
 
 annotated_data_list=("6" "7" "8" "9")
@@ -193,7 +217,7 @@ if [ "$pre_trained" = false ]; then
     esac
   done
 else
-  echo "Pre-trained model selected, skipping class distribution selection."
+  echo "Pre-trained model selected, skipping running tests."
 fi
 
 while true; do
