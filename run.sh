@@ -20,6 +20,9 @@ while true; do
   echo "13. Hybrid-postreduction-word2doc2vec"
   echo "14. Hybrid-postreduction-fasttext"
   echo "15. Hybrid-postreduction-wmd-word2vec"
+  echo "16. Word2doc2vec using Pre-trained Word2Vec model"
+  echo "17. fastText using Pre-trained fastText model"
+  echo "18. WMD-Word2vec using Pre-trained Word2Vec model"
   echo ""
 
   read -p "Enter the number corresponding to the approach: " choice
@@ -27,10 +30,13 @@ while true; do
   echo ""
 
 case $choice in
-    1)
+    1|16)
       echo ">> You selected: Word2doc2vec"
       echo ">> Downloading repository for Word2doc2vec."
       approach="word2doc2vec-doc-relevance-training"
+      if [ "$choice" -eq 16 ]; then
+        pre_trained=true
+      fi
       break
       ;;
     2)
@@ -39,16 +45,22 @@ case $choice in
       approach="doc2vec-doc-relevance-training"
       break
       ;;
-    3)
+    3|17)
       echo ">> You selected: fastText"
       echo ">> Downloading repository for fastText."
       approach="fasttext2doc2vec-doc-relevance-training"
+      if [ "$choice" -eq 17 ]; then
+        pre_trained=true
+      fi
       break
       ;;
-    4)
+    4|18)
       echo ">> You selected: WMD-Word2vec"
       echo ">> Downloading repository for WMD-Word2vec."
       approach="wmd-word2vec-training"
+      if [ "$choice" -eq 18 ]; then
+        pre_trained=true
+      fi
       break
       ;;
     5)
@@ -148,37 +160,41 @@ cd ${approach}
 git checkout dev
 echo "Changed branch"
 
-while true; do
-  echo ""
-  echo "Do you want to run tests for the ${approach} approach?"
-  echo "y. Run test for checking the datasets and reproducibility of the runs."
-  echo "n. Skip running test and execute the ${approach} pipeline."
-  echo ""
+if [ "$pre_trained" = false ]; then
+  while true; do
+    echo ""
+    echo "Do you want to run tests for the ${approach} approach?"
+    echo "y. Run test for checking the datasets and reproducibility of the runs."
+    echo "n. Skip running test and execute the ${approach} pipeline."
+    echo ""
 
-  read -p "Select yes or no (y/n): " test
-  echo ">> You selected: $test"
-  echo ""
+    read -p "Select yes or no (y/n): " test
+    echo ">> You selected: $test"
+    echo ""
 
-  case $test in
-    y)
-      echo "Running tests for dataset"
-      echo "WARNING! This could take a minute or two."
-      pytest ../tests/test_dataset.py --annotated_data "$annotated_data" 
-      echo "Running tests for run reproducibility"
-      echo "WARNING! This could take up to 2 to 3 hours."
-      pytest ../tests/test_reproducibility.py --category "$category" --algorithm "$algorithm"
-      break
-      ;;
-    n)
-      echo "Skipping tests"
-      break
-      ;;
-    *)
-      echo "Invalid choice. Please try again."
-      echo ""
-      ;;
-  esac
-done
+    case $test in
+      y)
+        echo "Running tests for dataset"
+        echo "WARNING! This could take a minute or two."
+        pytest ../tests/test_dataset.py --annotated_data "$annotated_data" 
+        echo "Running tests for run reproducibility"
+        echo "WARNING! This could take up to 2 to 3 hours."
+        pytest ../tests/test_reproducibility.py --category "$category" --algorithm "$algorithm"
+        break
+        ;;
+      n)
+        echo "Skipping tests"
+        break
+        ;;
+      *)
+        echo "Invalid choice. Please try again."
+        echo ""
+        ;;
+    esac
+  done
+else
+  echo "Pre-trained model selected, skipping class distribution selection."
+fi
 
 while true; do
   echo ""
@@ -229,8 +245,9 @@ fi
 
 echo ">> Initiating pipeline."
 
-
-if [ -z "${category}" ]; then
+if [ "$pre_trained" = true ]; then
+    python3 $python_script -i $train_dataset -t $test_dataset -v $valid_dataset -gt $test_ground_truth -gv $valid_ground_truth -u 1 -c $n_class -win 0
+elif [ -z "${category}" ]; then
     python3 $python_script -i $train_dataset -t $test_dataset -v $valid_dataset -gt $test_ground_truth -gv $valid_ground_truth -c $n_class -win 0
 elif [ "$category" = "pre" ]; then
     python3 $python_script -i $train_annotated_dataset -t $test_annotated_dataset -v $valid_annotated_dataset -gt $test_ground_truth -gv $valid_ground_truth -c $n_class -win 0
