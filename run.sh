@@ -29,6 +29,8 @@ while true; do
   echo "-------------------------------------------------"
   echo ""
 
+pre_trained=false
+
 case $choice in
     1|16)
       echo ">> You selected: Word2doc2vec"
@@ -36,8 +38,6 @@ case $choice in
       approach="word2doc2vec-doc-relevance-training"
       if [ "$choice" -eq 16 ]; then
         pre_trained=true
-      else
-        pre_trained=false
       fi
       break
       ;;
@@ -53,8 +53,6 @@ case $choice in
       approach="fasttext2doc2vec-doc-relevance-training"
       if [ "$choice" -eq 17 ]; then
         pre_trained=true
-      else
-        pre_trained=false
       fi
       break
       ;;
@@ -64,8 +62,6 @@ case $choice in
       approach="wmd-word2vec-training"
       if [ "$choice" -eq 18 ]; then
         pre_trained=true
-      else
-        pre_trained=false
       fi
       break
       ;;
