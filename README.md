@@ -11,7 +11,7 @@ This project consists of several approaches, each with detailed explanations and
 1. [Word2doc2vec](https://github.com/zbmed-semtec/word2doc2vec-doc-relevance-training)
 2. [Doc2vec](https://github.com/zbmed-semtec/doc2vec-doc-relevance-training)
 3. [fastText](https://github.com/zbmed-semtec/fasttext2doc2vec-doc-relevance-training)
-4. [WMD-Word2vec]()
+4. [WMD-Word2vec](https://github.com/zbmed-semtec/wmd-word2vec-training)
 5. [BERT]()
 6. [Hybrid-pre-word2doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/pre/word2doc2vec)
 7. [Hybrid-pre-doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/pre/doc2vec)
@@ -80,20 +80,34 @@ sudo apt install docker-ce
 
 ## Getting Started
 
+### 1. Clone the Repository
+First, clone the repository to your local machine using the following command:
 
-### 1. Building the Docker Image:
+##### Using HTTP:
+```
+git clone https://github.com/zbmed-semtec/private-ontoclue-project.git
+```
 
+##### Using SSH:
+Ensure you have set up SSH keys in your GitHub account.
+```
+git clone git@github.com:zbmed-semtec/private-ontoclue-project.git
+```
+
+### 2. Building the Docker Image:
+
+Change the directory to `private-ontoclue-project` and execute the following command:
 ```
 sudo docker build -t ontoclue .
 ```
 
-### 2. Running the Docker Container:
+### 3. Running the Docker Container:
 
 ```
 sudo docker run -it ontoclue
 ```
 
-### 3. Selecting Embedding Approach:
+### 4. Selecting Embedding Approach:
 
 After running the container, you will be prompted to select an embedding approach:
 
@@ -101,9 +115,9 @@ After running the container, you will be prompted to select an embedding approac
 
 Upon selecting an approach, the corresponding repository will be cloned from GitHub, and the appropriate datasets will be downloaded based on the chosen approach.
 
-### 4. Running Tests:
+### 5. Running Tests [Optional]:
 
-Once the datasets are downloaded, you will have the option to run tests. These tests verify:
+Once the datasets are downloaded, you will have the option to run tests. This is an optional step. These tests verify:
 
 - If the data was downloaded to the correct directory.
 - If the correct data corresponding to the selected approach was downloaded.
@@ -113,7 +127,7 @@ Depending on your preference, you can select **y** (yes) or **n** (no). You will
 
 ![](./docs/select_test.png)
 
-### 5. Selecting Class Distribution:
+### 6. Selecting Class Distribution:
 
 After the tests are completed, you will be prompted to select the class distribution. Depending on your preference, you can select **3** (three class distribution) or **2** (two class distribution).
 
@@ -121,66 +135,43 @@ After the tests are completed, you will be prompted to select the class distribu
 
 Following this, you will see a message indicating that the pipeline is being initiated. This process will take a while to complete 100 iterations.
 
-### 6. Viewing Log Files:
+### 7. Acessing and Viewing Log Files:
 
-To view log files, enter the Docker container by executing the following commands:
+The progress of the run is logged into files named Optuna_trials_{class_distribution}.log. Follow the steps below to view these log files and copy output files from the Docker container to your local system.
 
 #### 1. List all containers:
+First, list all running and stopped containers to find the one you need to access:
 ```
 sudo docker ps -a
 ```
 
-#### 2. Access the container:
+#### 2. Enter the container:
+Access the running Docker container using its container ID:
 ```
 sudo docker exec -it <container_id> /bin/bash
 ```
 
 #### 3. View log files:
+Once inside the container, view the log file associated with your specific run:
 
 ```
 cat <name_of_the_approach>/output_{3/2}/Optuna_trials_{3/2}.log
 ```
 
-### 7. Mounting a volume to the Docker Container (Optional):
+Here, replace {3/2} with 3 for a three-class distribution or 2 for a two-class distribution.
 
-Alternatively you can start the docker by attaching a volume.
+#### 4. Output Directory
 
-#### 1. Starting a container with a volume:
+The output files are stored in:
 
-```
-sudo docker run -v ontoclue_volume:/<name_of_the_approach> -it ontoclue
-```
++ `<name_of_the_approach>/output_3` for a three-class distribution.
++ `<name_of_the_approach>/output_2` for a two-class distribution.
 
-This will create and mount a volume named 'ontoclue_volume' if it does not exist into the /data directory of the 'ontoclue' container
 
-#### 2. Verify the creation of the volume.
-To verify if the volume was created and mounted to the container correctly, run the following command
-
-sudo docker inspect ontoclue_volume
-
-This should result in:
+#### 5. Copying files to your local system
+To copy files from the Docker container to your local system, use the following command:
 
 ```
-[
-    {
-        "CreatedAt": "2024-08-06T15:05:57Z",
-        "Driver": "local",
-        "Labels": null,
-        "Mountpoint": "/var/lib/docker/volumes/ontoclue_volume/_data",
-        "Name": "ontoclue_volume",
-        "Options": null,
-        "Scope": "local"
-    }
-]
-```
-
-#### 3. Output 
-
-The output files will be stored in the directory ```<name_of_the_approach/output_3>``` in case of a three class distribution and ```<name_of_the_approach/output_2>``` in case of a two class distribution.
-
-#### 4. Copying files to your local system
-To copy files in your local system, find out the container ID and execute
-
 sudo docker cp <container_ID>:/<name_of_the_approach>/output_[3/2] <path_to_local_dir>
-
-The first path is the path in the Docker container and the second path is the path on your local system 
+```
+Replace the first path with the appropriate path inside the container and the second path with the destination directory on your local machine.

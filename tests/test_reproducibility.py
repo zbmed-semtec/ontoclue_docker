@@ -10,23 +10,30 @@ import pandas as pd
 class TestRun:
 
     @pytest.fixture(autouse=True)
-    def setup(self):
+    def setup(self, category, algorithm):
         self.base_path = "code"
         self.test_dir_1 = "../tests/run_one"
         self.test_dir_2 = "../tests/run_two"
+        self.mesh_dict = "data/mesh_to_pmid_dict.tsv"
         self.log_file = "output_3/Optuna_trials_3.log"
         self.evaluation_path = "output_3/evaluation"
         self.parameter_file = "hyperparameters.yaml"
         self.precision_file = os.path.join(self.evaluation_path, "precision_3.tsv")
-        self.parameter_file_path = os.path.join(self.base_path, self.parameter_file)
-        with open(self.parameter_file_path, 'r') as file:
-            self.content = yaml.safe_load(file)
-            self.params = self.content.get('params', {})
-            self.iterations = self.content.get('iterations', {})
-        
+        if not (category and algorithm):
+            self.parameter_file_path = os.path.join(self.base_path, self.parameter_file)
+            with open(self.parameter_file_path, 'r') as file:
+                self.content = yaml.safe_load(file)
+                self.params = self.content.get('params', {})
+                self.iterations = self.content.get('iterations', {})
+        else:
+            self.parameter_file_path = os.path.join(f'code/{algorithm}/', self.parameter_file)
+            with open(self.parameter_file_path, 'r') as file:
+                self.content = yaml.safe_load(file)
+                self.params = self.content.get('params', {})
+                self.iterations = self.content.get('iterations', {})
+
         os.makedirs(self.test_dir_1, exist_ok=True)
         os.makedirs(self.test_dir_2, exist_ok=True)
-
 
     def test_parameters(self):
         for key, param in self.params.items():
@@ -75,11 +82,22 @@ class TestRun:
         assert 'n_trials' in updated_content['iterations']
         assert updated_content['iterations']['n_trials']['value'] == 3
 
-    def test_runs(self):
+    def test_runs(self, category, algorithm):
 
         run_trials = {}
+        if category == "pre":
+            print('Runnning test for pre-annotation category')
+            command = ['python3', f'code/{algorithm}/{category}/main.py', '-i', 'data/Split_Dataset/Annotated_Data/train_annotated.npy', '-t', 'data/Split_Dataset/Annotated_Data/test_annotated.npy', '-v', 'data/Split_Dataset/Annotated_Data/valid_annotated.npy', '-gt', 'data/Split_Dataset/Ground_truth/test.tsv', '-gv', 'data/Split_Dataset/Ground_truth/valid.tsv', '-c', '3', '-win', '0']
+        elif category == "post" or category == "postreduction":
+            print("Running test for post/postreduction category")
+            command = ['python3', f'code/{algorithm}/{category}/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-v', 'data/Split_Dataset/Data/valid.npy', '-gt', 'data/Split_Dataset/Ground_truth/test.tsv', '-gv', 'data/Split_Dataset/Ground_truth/valid.tsv', '-dict', self.mesh_dict, '-c', '3', '-win', '0']
+        else:
+            print("Running test for other approaches")
+            command = ['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-v', 'data/Split_Dataset/Data/valid.npy', '-gt', 'data/Split_Dataset/Ground_truth/test.tsv', '-gv', 'data/Split_Dataset/Ground_truth/valid.tsv', '-c', '3', '-win', '0']
+        
+
         for run in range(1, 3):
-            subprocess.run(['python3', 'code/main.py', '-i', 'data/Split_Dataset/Data/train.npy', '-t', 'data/Split_Dataset/Data/test.npy', '-g', 'data/Split_Dataset/Ground_truth/test.tsv', '-c', '3', '-win', '0'], check=True)
+            subprocess.run(command, check=True) 
 
             with open(self.log_file, 'r') as file:
                 lines = file.readlines()
@@ -95,18 +113,22 @@ class TestRun:
         
             precision_df_one = pd.read_csv(self.precision_file, sep='\t')
             run_trials[run]['precision'] = precision_df_one.iloc[-1].tolist()
+            
+            test_dir_log_filename = f'test_dir_{run}'
+            test_dir = getattr(self, test_dir_log_filename)
 
-            shutil.copy(self.log_file, f'self.test_dir_{run}')
-            shutil.copy(self.precision_file, f'self.test_dir_{run}')
-        
+            shutil.copy(self.log_file, os.path.join(test_dir, 'Optuna_trials_3.log'))
+            shutil.copy(self.precision_file, os.path.join(test_dir, 'precision_3.tsv'))
+
+            if os.path.exists('output_3'):
+                shutil.rmtree('output_3')
+
         assert run_trials[1][0] == run_trials[2][0], "Hyperparameter configurations differ between runs: trial one!"
         assert run_trials[1][1] == run_trials[2][1], "Hyperparameter configurations differ between runs: trial two!"
         assert run_trials[1][2] == run_trials[2][2], "Hyperparameter configurations differ between runs: trial three!"
         assert run_trials[1]['precision'] == run_trials[2]['precision'], "Precision values differ between runs!"
         
-        if os.path.exists('output_3'):
-            shutil.rmtree('output_3')
-
+        
     def test_remodify_yaml(self):
 
         original_data = self.content.copy()

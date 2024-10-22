@@ -1,5 +1,7 @@
 FROM python:3.9.9
 
+ENV PYTHONHASHSEED=42
+
 RUN apt-get update && \
     apt-get install -y git
 
