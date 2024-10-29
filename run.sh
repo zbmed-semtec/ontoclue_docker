@@ -174,7 +174,7 @@ for num in "${annotated_data_list[@]}"; do
     fi
 done
 
-sh data.sh "$approach" "$annotated_data" 
+./data.sh "$approach" "$annotated_data" 
 
 cd ${approach}
 git checkout dev
