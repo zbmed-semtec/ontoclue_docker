@@ -146,15 +146,41 @@ attempt=1
 max_attempts=3
 
 while [ $attempt -le $max_attempts ]; do
-  git clone https://github.com/zbmed-semtec/${approach}.git
+  echo "======================================"
+  echo "Select how to download the repository"
+  echo "======================================"
+  echo ""
+  echo "1. With https"
+  echo "2. With ssh"
+  echo ""
+  read -p "Enter the number corresponding to the download method: " download_choice
+  echo "-------------------------------------------------"
+  echo ""
 
-  if [ $? -eq 0 ]; then
-    echo "Repository cloned successfully."
-    break
+  case $download_choice in
+      1)
+        echo ">> You selected: With https"
+        git clone https://github.com/zbmed-semtec/${approach}.git
+        clone_result=$?
+        ;;
+      2)
+        echo ">> You selected: With ssh"
+        git clone git@github.com:zbmed-semtec/${approach}.git
+        clone_result=$?
+        ;;
+      *)
+        echo "Invalid choice. Please try again."
+        echo ""
+        ;;
+  esac
+
+  if [ $clone_result -eq 0 ]; then
+      echo "Repository cloned successfully."
+      break
   else
-    echo "Attempt $attempt of $max_attempts failed. Retrying..."
-    attempt=$((attempt+1))
-    sleep 2 
+      echo "Attempt $attempt of $max_attempts failed. Retrying..."
+      attempt=$((attempt+1))
+      sleep 2 
   fi
 
   if [ $attempt -gt $max_attempts ]; then

@@ -93,6 +93,16 @@ Ensure you have set up SSH keys in your GitHub account.
 ```
 git clone git@github.com:zbmed-semtec/private-ontoclue-project.git
 ```
+You will also need to setup your ssh agent for it to work with the docker container.
+```
+eval $(ssh-agent) > /dev/null
+ssh-add  -k /path/to/your/key
+```
+example with default name for the keys.
+```
+eval $(ssh-agent) > /dev/null
+ssh-add  -k /home/user/.ssh/id_ed25519
+```
 
 ### 2. Building the Docker Image:
 
@@ -105,6 +115,10 @@ sudo docker build -t ontoclue .
 
 ```
 sudo docker run -it ontoclue
+```
+If you are using the ssh agent, you will need to pass the ssh agent socket to the container.
+```
+docker run --mount type=bind,source=$SSH_AUTH_SOCK,target=/ssh-agent --env SSH_AUTH_SOCK=/ssh-agent -it ontoclue
 ```
 
 ### 4. Selecting Embedding Approach:
