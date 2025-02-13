@@ -203,7 +203,7 @@ done
 ./data.sh "$approach" "$annotated_data" 
 
 cd ${approach}
-git checkout dev
+git checkout main
 echo "Changed branch"
 
 if [ "$pre_trained" = false ]; then

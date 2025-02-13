@@ -13,16 +13,19 @@ This project consists of several approaches, each with detailed explanations and
 3. [fastText](https://github.com/zbmed-semtec/fasttext2doc2vec-doc-relevance-training)
 4. [WMD-Word2vec](https://github.com/zbmed-semtec/wmd-word2vec-training)
 5. [BERT]()
-6. [Hybrid-pre-word2doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/pre/word2doc2vec)
-7. [Hybrid-pre-doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/pre/doc2vec)
-8. [Hybrid-pre-fasttext](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/pre/fasttext)
-9. [Hybrid-pre-wmd-word2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/pre/wmd-word2vec)
-10. [Hybrid-post-word2doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/post/word2doc2vec)
-11. [Hybrid-post-fasttext](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/post/fasttext)
-12. [Hybrid-post-wmd-word2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/post/wmd-word2vec)
-13. [Hybrid-postreduction-word2doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/postreduction/word2doc2vec)
-14. [Hybrid-postreduction-fasttext](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/postreduction/fasttext)
-15. [Hybrid-postreduction-wmd-word2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/postreduction/wmd-word2vec)
+6. [Hybrid-pre-word2doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/word2doc2vec/pre)
+7. [Hybrid-pre-doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/doc2vec/pre)
+8. [Hybrid-pre-fasttext](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/fasttext/pre)
+9. [Hybrid-pre-wmd-word2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/wmd-word2vec/pre)
+10. [Hybrid-post-word2doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/word2doc2vec/post)
+11. [Hybrid-post-fasttext](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/fasttext/post)
+12. [Hybrid-post-wmd-word2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/wmd-word2vec/post)
+13. [Hybrid-postreduction-word2doc2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/word2doc2vec/postreduction)
+14. [Hybrid-postreduction-fasttext](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/fasttext/postreduction)
+15. [Hybrid-postreduction-wmd-word2vec](https://github.com/zbmed-semtec/hybrid-doc-relevance-training/tree/dev/code/wmd-word2vec/postreduction)
+16. [Word2doc2vec using Pre-trained Word2Vec model](https://github.com/zbmed-semtec/word2doc2vec-doc-relevance-training/blob/main/code/pretrained.py)
+17. [fastText using Pre-trained fastText model](https://github.com/zbmed-semtec/fasttext2doc2vec-doc-relevance-training/blob/main/code/pretrained.py)
+18. [WMD-Word2vec using Pre-trained Word2Vec model](https://github.com/zbmed-semtec/wmd-word2vec-training/blob/main/code/pretrained.py)
 
 ## Dockerized version of OntoClue
 
@@ -125,11 +128,17 @@ docker run --mount type=bind,source=$SSH_AUTH_SOCK,target=/ssh-agent --env SSH_A
 
 After running the container, you will be prompted to select an embedding approach:
 
-![](./docs/select_approach.png)
+![](./docs/select_approaches.png)
 
 Upon selecting an approach, the corresponding repository will be cloned from GitHub, and the appropriate datasets will be downloaded based on the chosen approach.
 
-### 5. Running Tests [Optional]:
+### 5. Cloning the Repsoitory
+
+Once you select the approach, you will be prompted to select the cloning method for the repository for the particular approach.
+
+![](./docs/select_cloning.png)
+
+### 6. Running Tests [Optional]:
 
 Once the datasets are downloaded, you will have the option to run tests. This is an optional step. These tests verify:
 
@@ -139,17 +148,17 @@ Once the datasets are downloaded, you will have the option to run tests. This is
 
 Depending on your preference, you can select **y** (yes) or **n** (no). You will see a prompt like this:
 
-![](./docs/select_test.png)
+![](./docs/select_tests.png)
 
-### 6. Selecting Class Distribution:
+### 7. Selecting Class Distribution:
 
 After the tests are completed, you will be prompted to select the class distribution. Depending on your preference, you can select **3** (three class distribution) or **2** (two class distribution).
 
-![](./docs/select_class.png)
+![](./docs/select_classes.png)
 
 Following this, you will see a message indicating that the pipeline is being initiated. This process will take a while to complete 100 iterations.
 
-### 7. Acessing and Viewing Log Files:
+### 8. Acessing and Viewing Log Files:
 
 The progress of the run is logged into files named Optuna_trials_{class_distribution}.log. Follow the steps below to view these log files and copy output files from the Docker container to your local system.
 
